@@ -1,0 +1,38 @@
+apply plugin: 'java-library'
+apply plugin: "me.champeau.gradle.jmh"
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.postgresql:postgresql:42.2.2',
+            'com.github.ben-manes.caffeine:caffeine:2.6.2'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+version = '0.1.0'
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+jmh {
+    duplicateClassesStrategy = 'warn'
+}
