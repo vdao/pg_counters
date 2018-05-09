@@ -8,9 +8,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Function;
-import java.util.function.LongBinaryOperator;
 import java.util.stream.Collectors;
 
 public class CachingCounterFactory implements Closeable {
@@ -28,11 +25,11 @@ public class CachingCounterFactory implements Closeable {
         this.writableCounterRegistry = new ConcurrentHashMap<>();
 
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(this::dumCounters,
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(this::dumpCounters,
                 scheduletDumpInterval, scheduletDumpInterval, timeUnit);
     }
 
-    public void dumCounters() {
+    public void dumpCounters() {
         Map<CounterId, Long> batch = writableCounterRegistry.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().sumAndReset()));
 
@@ -50,7 +47,7 @@ public class CachingCounterFactory implements Closeable {
     @Override
     public void close() throws IOException {
         scheduledThreadPoolExecutor.shutdown();
-        dumCounters();
+        dumpCounters();
     }
 
     private class LocalCachingCounter implements Counter {

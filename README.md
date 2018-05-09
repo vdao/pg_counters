@@ -10,3 +10,12 @@
 | Safe AtomicInteger counter with synchronized block                              | AtomicInteger | 19                  | 1               | synchronized    | 35281000,500 ± 233267,616  ops/s   |
 
 
+1 500 000 insertions in 110 sec.
+```
+counters-# \dt+ counter
+                     Список отношений
+ schema |   name  |  type | owner    | Size   |
+--------+---------+---------+----------+-------
+ public | counter | table | postgres | 88 MB  |
+
+```

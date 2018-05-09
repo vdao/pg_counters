@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PostgresCounterStorage implements CounterStorage {
 
@@ -22,18 +23,24 @@ public class PostgresCounterStorage implements CounterStorage {
                 "insert into counter(date, category, cid, val) values (?, ?, ?, ?)" +
                         " on conflict (date, category, cid) do update set val=counter.val+excluded.val")) {
 
+            final AtomicInteger rowCounter = new AtomicInteger();
             batch.entrySet().stream()
-                    .sorted(Comparator.comparing(Map.Entry::getKey,
-                            Comparator.comparing(v -> v.getCategory() + "_" + v.getId())))
+//                    .sorted(Comparator.comparing(Map.Entry::getKey,
+//                            Comparator.comparing(v -> v.getCategory() + "_" + v.getId())))
                     .forEach(e -> {
                         try {
                             // Avoid empty value insertion
                             if (e.getValue() != 0) {
+                                rowCounter.incrementAndGet();
                                 statement.setDate(1, new Date(System.currentTimeMillis()));
                                 statement.setString(2, e.getKey().getCategory());
                                 statement.setString(3, e.getKey().getId());
                                 statement.setLong(4, e.getValue());
                                 statement.addBatch();
+
+                                if (rowCounter.get() % 10000 == 0) {
+                                    statement.executeBatch();
+                                }
                             }
                         } catch (SQLException ex) {
                             throw new RuntimeException(ex);

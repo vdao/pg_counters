@@ -34,7 +34,7 @@ public class PostgresCounterStorageTest {
             }
             System.out.println("count_time=" + (System.currentTimeMillis() - start));
             start = System.currentTimeMillis();
-            cachingCounterFactory.dumCounters();
+            cachingCounterFactory.dumpCounters();
             System.out.println("insertion_time=" + (System.currentTimeMillis() - start));
         }
 
@@ -80,7 +80,7 @@ public class PostgresCounterStorageTest {
 
         String category = "tag";
         long start = System.currentTimeMillis();
-        for (int day = 0; day < 100; day++) {
+        for (int day = 0; day < 30; day++) {
             for (int item = 0; item < 100; item++) {
                 for (int feature = 0; feature < 500; feature++) {
                     CounterId id = new CounterId(category + "_" + day, item + "_" + feature);
